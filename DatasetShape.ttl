@@ -1,0 +1,164 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dh: <https://data.pnnl.gov/ns#> .
+
+dh:DatasetShape
+	a sh:NodeShape ;
+	sh:targetClass schema:Dataset ;
+	rdfs:label "DatasetShape" ;
+	sh:property [
+		sh:path schema:name ;
+		sh:datatype xsd:string ;
+		sh:name "name" ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path schema:description ;
+		sh:datatype xsd:string ;
+		sh:name "description" ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;	
+	] ;
+	sh:property [
+		sh:path schema:datePublished ;
+		sh:or (
+			[
+				sh:datatype xsd:string ;
+				sh:pattern "^\\d{4}-\\d{2}-\\d{2}$"  ;
+			]
+			[
+				sh:datatype schema:Date ;
+			]
+			[
+				sh:datatype xsd:dateTime ;
+			]
+		)
+	] ;
+	sh:property [
+		sh:path schema:isAccessibleForFree ;
+		sh:datatype xsd:boolean ;
+	] ;
+	sh:property [
+		sh:path schema:keywords ;
+		sh:datatype xsd:string ;
+	] ;
+	sh:property [
+		sh:path schema:url ;
+		sh:description "We need at least one email value" ;
+		sh:datatype xsd:string ;
+		sh:pattern "^(http[s]?):(\\/\\/)(data)(\\.)(pnnl)(\\.)(gov)(\\/)(dataset)(\\/)([0-9]+)$" ;
+		sh:message "url should be a DataHub dataset (it should begin with https://data.pnnl.gov/dataset/)" ;
+			
+			# [
+			# 	sh:datatype xsd:string ;
+			# 	sh:pattern "^(http[s]?):(\\/\\/)(data)(\\.)(pnnl)(\\.)(gov)(\\/)(project)(\\/)([0-9]+)$" ;
+			# ]
+		
+	] ;
+	sh:property [
+		sh:path schema:includedInDataCatalog ;
+		sh:targetNode dh:DataCatalogShape ;
+	] ;
+	sh:property [
+		sh:path schema:creator ;
+		sh:targetNode dh:CreatorShape ;
+		sh:nodeKind sh:IRI ;
+		sh:pattern "^(http[s]?):(\\/\\/)(orcid)(\\.)(org)(\\/)\\d{4}-\\d{4}-\\d{4}-\\d{4}$"
+	] ;
+	sh:property [
+		sh:path schema:publisher ;
+		sh:node dh:PNNLOrganizationShape ;
+		sh:minCount 1 ;
+	] ;
+	sh:property [
+		sh:path schema:distribution ;
+		sh:node dh:DataDownloadShape;
+	] .
+dh:DataCatalogShape
+	a sh:NodeShape ;
+	sh:targetClass schema:DataCatalog ;
+	sh:property [
+		sh:path schema:name ;
+		sh:datatype xsd:string ;
+		sh:pattern "DataHub" ;
+		sh:minCount 1 ;
+	] ;
+	sh:property [
+		sh:path schema:url ;
+		sh:datatype xsd:string ;
+		sh:pattern "^(http[s]?):(\\/\\/)(data)(\\.)(pnnl)(\\.)(gov)(\\/)$" ;
+	] .
+dh:CreatorShape
+	a sh:NodeShape ;
+	sh:targetClass schema:Person ;
+	sh:property [
+		sh:path schema:name ;
+		sh:datatype xsd:string ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+	] ;
+	sh:property [
+		sh:path schema:familyName ;
+		sh:datatype xsd:string ;
+	] ;
+	sh:property [
+		sh:path schema:givenName ;
+		sh:datatype xsd:string ;
+	] ;
+	sh:property [
+		sh:path schema:url ;
+		sh:or (
+			[
+				sh:datatype xsd:string ;
+				sh:pattern "^(http[s]?):(\\/\\/)(data)(\\.)(pnnl)(\\.)(gov)(\\/)(person)(\\/)([0-9]+)$" ;
+			]
+			# [
+			# 	sh:datatype xsd:anyURI ;
+			# ]
+		)
+	] ;
+	sh:property [
+		sh:path schema:affiliation ;
+		sh:minCount 1 ;
+	] .
+dh:PNNLOrganizationShape 
+	a sh:NodeShape ;
+	sh:targetClass schema:Organization ;
+	sh:propery [
+		sh:path schema:name ;
+		sh:datatype xsd:string ;
+		sh:minCount 1 ;
+		sh:maxCount 1 ;
+		sh:or (
+			[
+				sh:pattern "Pacific Northwest National Laboratory" ;
+			]
+			[
+				sh:pattern "PNNL" ;
+			]
+		)
+	] ;
+	sh:property [
+		sh:path schema:sameAs ;
+		sh:datatype xsd:string ; 
+		sh:pattern "^https://ror.org/05h992307$" ;
+	] .
+dh:DataDownloadShape
+	a sh:NodeShape ;
+	sh:targetClass schema:DataDownload ;
+	sh:property [
+		sh:path schema:encodingFormat ;
+		sh:datatype xsd:string ;
+		sh:pattern "^([a-z]+)(\\/)(.+)$" ;
+		sh:minCount 1 ;
+	] ;
+	sh:propery [
+		sh:path schema:contentUrl ;
+		sh:minCount 1 ;
+	] .
